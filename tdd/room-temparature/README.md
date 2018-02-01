@@ -19,3 +19,4 @@ room = Room.new({
 room.change_temperature('ac1', 21)
 => CHANGED TEMPERATURE
 => {comfortable: ['john'], not_comfortable: ['mary']}
+```

@@ -18,3 +18,7 @@ game.dice(6)
 => CURRENT_POSITION: 15
 
 ...
+
+game.dice(4)
+=> GAME WON
+```
