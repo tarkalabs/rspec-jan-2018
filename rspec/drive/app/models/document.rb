@@ -1,9 +1,5 @@
 class Document < ApplicationRecord
   belongs_to :folder
-<<<<<<< HEAD
-  has_many :shares
-||||||| merged common ancestors
-=======
 
   before_save :strip_name
 
@@ -21,5 +17,4 @@ class Document < ApplicationRecord
       self.name = self.name.strip
     end
 
->>>>>>> 343b97082cb7a00963d5837cb71a766ca1cc4604
 end
