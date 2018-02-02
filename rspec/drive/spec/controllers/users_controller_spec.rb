@@ -28,8 +28,8 @@ RSpec.describe UsersController, type: :controller do
   # This should return the minimal set of attributes required to create a valid
   # User. As you add validations to User, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) {FactoryBot.attributes_for(:user)}
-
+  let!(:user) {FactoryBot.create(:user)}
+  let(:valid_attributes) {FactoryBot.attributes_for(:user1)}
   let(:invalid_attributes) {FactoryBot.attributes_for(:invalid_user)}
 
   # This should return the minimal set of values that should be in the session
@@ -39,17 +39,22 @@ RSpec.describe UsersController, type: :controller do
 
   describe "GET #index" do
     it "returns a success response" do
-      user = User.create! valid_attributes
       get :index, params: {}, session: valid_session
       expect(response).to be_success
+      expect(assigns(:users).count).to eq(1)
     end
   end
 
   describe "GET #show" do
     it "returns a success response" do
-      user = User.create! valid_attributes
       get :show, params: {id: user.to_param}, session: valid_session
       expect(response).to be_success
+      expect(assigns(:user).name).to eq(user.name)
+    end
+
+    it "returns a error response" do
+      get :show, params: {id: -100}, session: valid_session
+      expect(response.status).to eq(404)
     end
   end
 
@@ -62,9 +67,14 @@ RSpec.describe UsersController, type: :controller do
 
   describe "GET #edit" do
     it "returns a success response" do
-      user = User.create! valid_attributes
       get :edit, params: {id: user.to_param}, session: valid_session
       expect(response).to be_success
+      expect(assigns(:user)).to eq(user)
+    end
+
+    it "returns a error response" do
+      get :edit, params: {id: 0}, session: valid_session
+      expect(response.status).to eq(404)
     end
   end
 
@@ -82,56 +92,65 @@ RSpec.describe UsersController, type: :controller do
       end
     end
 
-    # context "with invalid params" do
-    #   it "returns a success response (i.e. to display the 'new' template)" do
-    #     post :create, params: {user: invalid_attributes}, session: valid_session
-    #     expect(response).to be_success
-    #   end
-    # end
+    context "with invalid params" do
+      it "returns a success response (i.e. to display the 'new' template)" do
+        post :create, params: {user: invalid_attributes}, session: valid_session
+        expect(response).to be_success
+        expect(assigns(:user).errors.messages[:name][0]).to eq("can't be blank")
+      end
+    end
   end
 
   describe "PUT #update" do
     context "with valid params" do
       let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
+        FactoryBot.attributes_for(:user1)
       }
 
       it "updates the requested user" do
-        user = User.create! valid_attributes
         put :update, params: {id: user.to_param, user: new_attributes}, session: valid_session
-        user.reload
-        skip("Add assertions for updated state")
+        #user.reload
+        expect(user.name).not_to eq(assigns(:user).name)
+        expect(user.email).not_to eq(assigns(:user).email)
       end
 
       it "redirects to the user" do
-        user = User.create! valid_attributes
         put :update, params: {id: user.to_param, user: valid_attributes}, session: valid_session
         expect(response).to redirect_to(user)
       end
+
+      it "returns a error response" do
+        put :update, params: {id: 0}, session: valid_session
+        expect(response.status).to eq(404)
+      end
     end
 
-    # context "with invalid params" do
-    #   it "returns a success response (i.e. to display the 'edit' template)" do
-    #     user = User.create! valid_attributes
-    #     put :update, params: {id: user.to_param, user: invalid_attributes}, session: valid_session
-    #     expect(response).to be_success
-    #   end
-    # end
+    context "with invalid params" do
+      it "returns a success response (i.e. to display the 'edit' template)" do
+        put :update, params: {id: user.to_param, user: invalid_attributes}, session: valid_session
+        expect(response).to be_success
+        expect(assigns(:user).errors.messages[:name][0]).to eq("can't be blank")
+      end
+    end
   end
 
   describe "DELETE #destroy" do
     it "destroys the requested user" do
-      user = User.create! valid_attributes
       expect {
         delete :destroy, params: {id: user.to_param}, session: valid_session
       }.to change(User, :count).by(-1)
     end
 
     it "redirects to the users list" do
-      user = User.create! valid_attributes
       delete :destroy, params: {id: user.to_param}, session: valid_session
       expect(response).to redirect_to(users_url)
     end
+
+    it "returns a error response" do
+      delete :destroy, params: {id: 0}, session: valid_session
+      expect(response.status).to eq(404)
+    end
+
   end
 
 end
