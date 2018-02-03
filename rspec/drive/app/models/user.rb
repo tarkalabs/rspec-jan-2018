@@ -1,5 +1,9 @@
 class User < ApplicationRecord
+
   FREE_PLAN_CAPACITY = 5000.freeze
+
+  has_many :folders
+  has_many :shares, foreign_key: :recipient_id
 
   validates_presence_of :name, :email
   validates_uniqueness_of :email
